@@ -1,0 +1,33 @@
+//@version=5
+indicator("Kapsamlı Kripto Ticaret Stratejisi", overlay=true)
+
+// Hareketli Ortalama Parametreleri
+short_ma_periyodu = input(10, title="Kısa Hareketli Ortalama Periyodu")
+long_ma_periyodu = input(30, title="Uzun Hareketli Ortalama Periyodu")
+
+// MACD Parametreleri
+macd_hizalama_periyodu = input(9, title="MACD Hizalama Periyodu")
+macd_hizalama_sinyal_periyodu = input(6, title="MACD Hizalama Sinyal Periyodu")
+
+// Hareketli Ortalamalar
+short_ma = ta.sma(close, short_ma_periyodu)
+long_ma = ta.sma(close, long_ma_periyodu)
+
+// MACD Hesaplama
+[macd_line, signal_line, _] = ta.macd(close, macd_hizalama_periyodu, macd_hizalama_sinyal_periyodu, 6)
+
+// Ticaret Kararları
+uzun_giris = ta.crossover(short_ma, long_ma) and ta.crossover(macd_line, signal_line)
+kisa_cikis = ta.crossunder(short_ma, long_ma) and ta.crossunder(macd_line, signal_line)
+
+// Ticaret Sinyallerini Gösterme
+plotshape(series=uzun_giris, title="Al", color=color.green, style=shape.labelup, text="Al", location=location.belowbar, textcolor=color.white)
+plotshape(series=kisa_cikis, title="Sat", color=color.red, style=shape.labeldown, text="Sat", location=location.abovebar, textcolor=color.white)
+
+// Hareketli Ortalamaları Grafikte Gösterme
+plot(short_ma, color=color.blue, title="Kısa Hareketli Ortalama")
+plot(long_ma, color=color.red, title="Uzun Hareketli Ortalama")
+
+// MACD Göstergesini Grafikte Gösterme
+hline(0, "MACD Sıfır Çizgisi", color=color.gray)
+plot(macd_line - signal_line, color=color.orange, title="MACD Histogram")
